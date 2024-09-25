@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &71697229
 Transform:
   m_ObjectHideFlags: 0
@@ -823,6 +823,10 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 5
   firstPersonCamera: {fileID: 330585545}
+  thirdPersonCamera: {fileID: 71697232}
+  radius: 5
+  minRadius: 1
+  maxRadius: 10
   yMinLimit: 30
   yMaxLimit: 90
   mouseSenesitivity: 2
