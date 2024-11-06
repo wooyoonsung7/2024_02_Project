@@ -52,6 +52,6 @@ public class PlayerStateMachine : MonoBehaviour
         currentState.Enter();
 
         //로그에 상태 저환 정보를 출력
-        Debug.Log($"상태 전환 되는 스테이트 : {newState.GetType().Name}");   
+        //Debug.Log($"상태 전환 되는 스테이트 : {newState.GetType().Name}");   
     }
 }
