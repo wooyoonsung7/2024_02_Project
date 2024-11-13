@@ -1,6 +1,6 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class VehicleManager : MonoBehaviour
@@ -12,7 +12,6 @@ public class VehicleManager : MonoBehaviour
 
     float Timer;                            //타이머 선언
 
-    // Update is called once per frame
     void Update()
     {
         //car.Move();
@@ -22,20 +21,19 @@ public class VehicleManager : MonoBehaviour
         {
             vehicles[i].Move();
         }
+                
 
-
-        Timer -= Time.deltaTime;            //타이머를 카운트를 한다
+        Timer -= Time.deltaTime;            //타이머 카운트를 한다. 
         if(Timer <= 0 )
-        {   
-            for (int i = 0;i < vehicles.Length;i++)
+        {
+            for (int i = 0; i < vehicles.Length; i++)
             {
                 vehicles[i].Horn();
             }
-            //car.Horn();
-            //bicycle.Horn();
+            //car.Horn();            
+            //bicycle.Horn();                       
 
-            Timer = 1.0f;                  //1초로 만들어준다
-
+            Timer = 1.0f;                   //1초로 만들어준다.
         }
     }
 }

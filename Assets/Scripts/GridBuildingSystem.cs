@@ -1,15 +1,15 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//GridCell í´ë˜ìŠ¤ëŠ” ê° ê·¸ë¦¬ë“œ ì…€ì˜ ìƒíƒœì•„ ë°ì´í„°ë¥¼ ê´€ë¦¬
+//GridCell Å¬·¡½º´Â °¢ ±×¸®µå ¼¿ÀÇ »óÅÂ¿Í µ¥ÀÌÅÍ¸¦ °ü¸® 
 public class GridCell
 {
-    public Vector3 Position;                            //ì…€ì˜ ê·¸ë¦¬ë“œ ë‚´ ìœ„ì¹˜
-    public bool IsOccupied;                             //ì…€ì´ ê±´ë¬¼ë¡œ ì°¨ìˆëŠ”ì§€ ì—¬ë¶€
-    public GameObject Building;                         //ì…€ì— ë°°ì¹˜ëœ ê±´ë¬¼ ê°ì²´
+    public Vector3Int Position;                         //¼¿ÀÇ ±×¸®µå ³» À§Ä¡
+    public bool IsOccupied;                             //¼¿ÀÌ °Ç¹°·Î Â÷ÀÖ´ÂÁö ¿©ºÎ 
+    public GameObject Building;                         //¼¿¿¡ ¹èÄ¡µÈ °Ç¹° °´Ã¼ 
 
-    public GridCell(Vector3 position)                   //ìƒì„±ì ê°ì²´ê°€ í˜¸ì¶œ ëœë•Œ
+    public GridCell(Vector3Int position)                //»ı¼ºÀÚ °´Ã¼°¡ È£Ãâ µÉ¶§ 
     {
         Position = position;
         IsOccupied = false;
@@ -19,167 +19,170 @@ public class GridCell
 
 public class GridBuildingSystem : MonoBehaviour
 {
-    [SerializeField] private int width = 10;            //ê·¸ë¦¬ë“œ ê°€ë¡œ í¬ê¸°
-    [SerializeField] private int height = 10;           //ê·¸ë¦¬ë“œ ì„¸ë¡œ í¬ê¸°
-    [SerializeField] private float cellSize = 1;        //ê° ì…€ì˜ í¬ê¸°
+    [SerializeField] private int width = 10;            //±×¸®µå °¡·Î Å©±â
+    [SerializeField] private int height = 10;           //±×¸®µå ¼¼·Î Å©±â 
+    [SerializeField] private float cellSize = 1;        //°¢ ¼¿ÀÇ Å©±â 
 
-    [SerializeField] private GameObject cellPrefab;       //ì…€ í”„ë¦¬íŒ¹
-    [SerializeField] private GameObject buildingPrefab;   //ê±´ë¬¼ í”„ë¦¬íŒ¹
-    [SerializeField] private PlayerController playerController;         //í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ ì°¸ì¡°
-    [SerializeField] private float maxBuildDistance = 5f;               //ê±´ì„¤ ê°€ëŠ¥í•œ ìµœëŒ€ ê±°ë¦¬
+    [SerializeField] private GameObject cellPrefab;         //¼¿ ÇÁ¸®ÆÕ
+    [SerializeField] private GameObject buildingPrefabs;    //°Ç¹° ÇÁ¸®ÆÕ
+    [SerializeField] private PlayerController playerController;         //ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯ ÂüÁ¶
+    [SerializeField] private float maxBuildDistance = 5f;               //°Ç¼³ °¡´ÉÇÑ ÃÖ´ë °Å¸®
 
-    [SerializeField] private Grid grid;                          //ê·¸ë¦¬ë“œ ì„ ì–¸ í›„ ë°›ì•„ì˜¨ë‹¤.
-    private GridCell[,] cells;                                   //2ì°¨ ë°°ì—´ë¡œ ì„ ì–¸ GridCell
-    private Camera firstPersonCamera;                            //í”Œë ˆì´ì–´ì˜ 1ì¸ì¹­ ì¹´ë ˆë¼ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
+    [SerializeField] private Grid grid;                                  //±×¸®µå ¼±¾ğ ÈÄ ¹Ş¾Æ¿Â´Ù.
+    private GridCell[,] cells;                                           //2Â÷ ¹è¿­·Î ¼±¾ğ GridCell
+    private Camera firstPersonCamera;                                   //ÇÃ·¹ÀÌ¾îÀÇ 1ÀÎÄª Ä«¸Ş¶ó¸¦ °¡Á®¿Â´Ù. 
 
     void Start()
     {
-        firstPersonCamera = playerController.firstPersonCamera;
+        firstPersonCamera = playerController.firstPersonCamera;             //ÇÃ·¹ÀÌ¾îÀÇ 1ÀÎÄª Ä«¸Ş¶ó¸¦ °¡Á®¿Â´Ù.
         CreateGrid();
     }
 
-    private void Update()
+    void Update()
     {
         Vector3 lookPosition = GetLookPosition();
-        if(lookPosition != Vector3.zero)            //í¬ì§€ì…˜ì´ 0ì´ ì•„ë‹ë•Œ
+        if(lookPosition != Vector3.zero)            //Æ÷Áö¼ÇÀÌ 0ÀÌ ¾Æ´Ò‹š
         {
-            Vector3Int gridPosition = grid.WorldToCell(lookPosition);      //ë³´ê³  ìˆëŠ” ê·¸ë¦¬ë“œ ì…€ì˜ ì›”ë“œ ì¢Œí‘œë¥¼ ë°›ì•„ì˜¨ë‹¤.
-            if (isValidGridPosition(gridPosition))
+            Vector3Int gridPosition = grid.WorldToCell(lookPosition);   //º¸°í ÀÖ´Â ±×¸®µå ¼¿ÀÇ ¿ùµå ÁÂÇ¥¸¦ ¹Ş¾Æ¿Â´Ù.
+            if (isValidGridPosition(gridPosition))                      //±×¸®µå À§Ä¡°¡ ¸ÂÀ» °æ¿ì 
             {
-                HighlightCell(gridPosition);
+                HighlightCell(gridPosition);                            //ÇØ´ç ±×¸®µå¸¦ Ç¥½ÃÇØÁØ´Ù.
                 if(Input.GetMouseButtonDown(0))
                 {
                     PlaceBuilding(gridPosition);
                 }
-                if(Input.GetMouseButtonDown(1))
+                if (Input.GetMouseButtonDown(1))
                 {
                     RemoveBuilding(gridPosition);
                 }
             }
         }
     }
-    //ê·¸ë¦¬ë“œë¥¼ ìƒì„±í•˜ê³  ì…€ì„ ì´ˆê¸°í™”í•˜ëŠ” í•¨ìˆ˜
+
+    //±×¸®µå ¼¿¿¡ °Ç¹°À» ¹èÄ¡ÇÏ´Â ÇÔ¼ö
     private void PlaceBuilding(Vector3Int gridPosition)
     {
-        GridCell cell = cells[gridPosition.x, gridPosition.z];
-        if(!cell.IsOccupied)
+        GridCell cell = cells[gridPosition.x, gridPosition.z];          //±×¸®µå ¼¿À» ÅëÇØ¼­ ÇØ´ç Å¸ÀÏ µ¥ÀÌÅÍ¿¡ Á¢±Ù
+        if(!cell.IsOccupied)                                            //¼¿ÀÌ ºñ¾î ÀÖÀ» °æ¿ì
         {
-            Vector3 worldPosition = grid.GetCellCenterWorld(gridPosition);
-            GameObject building = Instantiate(buildingPrefab, worldPosition, Quaternion.identity);
-            cell.IsOccupied = true;
-            cell.Building = building;
+            Vector3 worldPosition = grid.GetCellCenterWorld(gridPosition);      //¼¿ÀÇ À§Ä¡¸¦ °¡Á®¿Â´Ù.
+            GameObject building = Instantiate(buildingPrefabs, worldPosition, Quaternion.identity); //°Ç¹°À» »ı¼ºÇÑ´Ù. 
+            cell.IsOccupied = true;                                             //¼¿¿¡ °Ç¹°ÀÌ ÀÖ´Ù°í Ç¥½Ã
+            cell.Building = building;                                           //°Ç¹° ¿ÀºêÁ§Æ®¸¦ ³Ö´Â´Ù. 
         }
     }
 
-    private void RemoveBuilding(Vector3Int gridPosition)
+    //ÇÃ·¹ÀÌ¾î ±×¸®µå ¼¿¿¡¼­ °Ç¹°À» Á¦°ÅÇÏ´Â ÇÔ¼ö
+    private void RemoveBuilding(Vector3Int gridPosition)           
     {
-        GridCell cell = cells[gridPosition.x, gridPosition.z];
-
-        if (!cell.IsOccupied)
+        GridCell cell = cells[gridPosition.x, gridPosition.z];          //±×¸®µå ¼¿À» ÅëÇØ¼­ ÇØ´ç Å¸ÀÏ µ¥ÀÌÅÍ¿¡ Á¢±Ù
+        if (cell.IsOccupied)                                            //¼¿¿¡ °Ç¹°ÀÌ ÀÖÀ» °æ¿ì
         {
-            Destroy(cell.Building);
-            cell.IsOccupied = true;
-            cell.Building = null;
+            Destroy(cell.Building);                                     //ÇØ´ç °Ç¹° »èÁ¦
+            cell.IsOccupied = true;                                     //¼¿¿¡ °Ç¹°ÀÌ ÀÖ´Ù°í Ç¥½Ã
+            cell.Building = null;                                      //°Ç¹° ¿ÀºêÁ§Æ®¸¦ ³Ö´Â´Ù. 
         }
     }
 
+    //±×¸®µå¸¦ »ı¼ºÇÏ°í ¼¿À» ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö 
     private void CreateGrid()
     {
-        grid.cellSize = new Vector3(cellSize, cellSize, cellSize);      //ì„¤ì •í•œ ì…€ ì‚¬ì´ì¦ˆë¥¼ ê·¸ë¦¬ë“œ ì»´í¬ë„ŒíŠ¸ì— ë„£ëŠ”ë‹¤.
-        cells = new GridCell[width, height];                            //ê·¸ë¦¬ë“œ ê°€ë¡œ ì„¸ë¡œ ì¹¸ìˆ˜ ì„¤ì •
-        Vector3 gridCenter = playerController.transform.position;       //í”Œë ˆì´ì–´ ì¤‘ì‹¬ìœ¼ë¡œ ê·¸ë¦¬ë“œ ìƒì„± (ì›í•˜ëŠ” ìœ„ì¹˜ë¡œ ë³€ê²½ê°€ëŠ¥)
+        grid.cellSize = new Vector3(cellSize, cellSize, cellSize);  //¼³Á¤ÇÑ ¼¿ »çÀÌÁî¸¦ ±×¸®µå ÄÄÆ÷³ÍÆ®¿¡ ³Ö´Â´Ù.
+        cells = new GridCell[width, height];                        //±×¸®µå °¡·Î ¼¼·Î Ä­¼ö ¼³Á¤ 
+        Vector3 gridCenter = playerController.transform.position;   //ÇÃ·¹ÀÌ¾î Áß½ÉÀ¸·Î ±×¸®µå »ı¼º (¿øÇÏ´Â À§Ä¡·Î º¯°æ°¡´É)
         gridCenter.y = 0;
-        transform.position = gridCenter - new Vector3(width * cellSize / 2.0f, 0, height * cellSize / 2);       //ê·¸ë¦¬ë“œ ì¤‘ì‹¬ìœ¼ë¡œ ì´ë™ ì‹œí‚¨ë‹¤.
+        transform.position = gridCenter - new Vector3(width * cellSize / 2.0f, 0, height * cellSize / 2);   //±×¸®µå Áß½ÉÀ¸·Î ÀÌµ¿ ½ÃÅ²´Ù.
 
-        for (int x = 0; x < width; x++)
+        for(int x = 0; x < width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for(int z = 0; z < height; z++)
             {
-                Vector3Int cellPosition = new Vector3Int(x, 0, z);                   //(0,0,0) (1,0,0), (2,0,0) ~ (10,0,10) for ë¬¸ ëŒë¦¬ë©´ì„œ ë°°ì¹˜
-                Vector3 worldPosition = grid.GetCellCenterWorld(cellPosition);  //gridë¥¼ í†µí•´ ì›”ë“œ í¬ì§€ì…˜ì„ ê°€ì ¸ì˜¨ë‹¤.
-                GameObject cellObject = Instantiate(cellPrefab, worldPosition, cellPrefab.transform.rotation);      //ì„¤ì •í•œ ê·¸ë¦¬ë“œë¥¼ ë§Œë“ ë‹¤.
-                cellObject.transform.SetParent(transform);                      //ì§€ê¸ˆ ì˜¤ë¸Œì íŠ¸ í•˜ìœ„ë¡œ ì„¤ì • í•œë‹¤.
+                Vector3Int cellPosition = new Vector3Int(x, 0, z);              //(0,0,0) (1,0,0), (2,0,0) ~ (10,0,10) for ¹® µ¹¸®¸é¼­ ¹èÄ¡
+                Vector3 worldPosition = grid.GetCellCenterWorld(cellPosition);  //grid¸¦ ÅëÇØ ¿ùµå Æ÷Áö¼ÇÀ» °¡Á®¿Â´Ù. 
+                GameObject cellObject = Instantiate(cellPrefab, worldPosition, cellPrefab.transform.rotation); //¼³Á¤ÇÑ ±×¸®µå¸¦ ¸¸µç´Ù. 
+                cellObject.transform.SetParent(transform);                      //Áö±İ ¿ÀºêÁ§Æ® ÇÏÀ§·Î ¼³Á¤ ÇÑ´Ù. 
 
-                cells[x, z] = new GridCell(cellPosition);                       //ì…€ ë°ì´í„° ê°’ì„ ìƒì„± í•œë‹¤.
-
+                cells[x, z] = new GridCell(cellPosition);                       //¼¿ µ¥ÀÌÅÍ °ªÀ» »ı¼º ÇÑ´Ù. 
             }
         }
     }
-    
-    //ì„ íƒëœ ì…€ì„ í•˜ì´ë¼ì´íŠ¸í•˜ëŠ” í•¨ìˆ˜
 
+    //¼±ÅÃµÈ ¼¿À» ÇÏÀÌ¶óÀÌÆ®ÇÏ´Â ÇÔ¼ö 
     private void HighlightCell(Vector3Int gridPosition)
     {
-        for (int x = 0; x < width; x++)
+        for(int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                GameObject cellObject = cells[x, z].Building != null ? cells[x, z].Building : transform.GetChild(x * height + z).gameObject;
+                //Cells 2Â÷¿ø ¹è¿­¿¡ ¼±¾ğµÇ¾îÀÖ´Â °ÔÀÓ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿Â´Ù.
+                GameObject cellObject = 
+                    cells[x, z].Building!=null?cells[x, z].Building:transform.GetChild(x * height + z).gameObject;
                 cellObject.GetComponent<Renderer>().material.color = Color.white;
             }
         }
 
         GridCell cell = cells[gridPosition.x, gridPosition.z];
-        GameObject highlightObject =
-            cell.Building!=null?cell.Building:transform.GetChild(gridPosition.x * height + gridPosition.z).gameObject;
-        highlightObject.GetComponent<Renderer>().material.color = cell.IsOccupied? Color.red : Color.green;
+        GameObject highlightObject = 
+            cell.Building!=null?cell.Building:transform.GetChild(gridPosition.x*height + gridPosition.z).gameObject;
+        highlightObject.GetComponent<Renderer>().material.color = cell.IsOccupied?Color.red:Color.green;
     }
 
-    //í”Œë ˆì´ì–´ê°€ ë³´ê³  ìˆëŠ” ìœ„ì¹˜ë¥¼ ê³„ì‚°í•˜ëŠ” ë§¤ì„œë“œ
+    //ÇÃ·¹ÀÌ¾î°¡ º¸°í ÀÖ´Â À§Ä¡¸¦ °è»êÇÏ´Â ¸Ş¼­µå
     private Vector3 GetLookPosition()
     {
-        if (playerController.isActiveAndEnabled) //í”Œë ˆì´ì–´ê°€ 1ì¸ì¹­ ëª¨ë“œ
+        if (playerController.isFirstPerson) //ÇÃ·¹ÀÌ¾î°¡ 1ÀÎÄª ¸ğµå 
         {
-            Ray ray = new Ray(firstPersonCamera.transform.position, firstPersonCamera.transform.forward);   //ë°›ì•„ì˜¨ 1ì¸ì¹­ ì¹´ë©”ë¼ ì•ìœ¼ë¡œ ray
-            if (Physics.Raycast(ray, out RaycastHit hitInfo, maxBuildDistance))  //ì„¤ì •í•œ rayì— ë¬¼ì²´ê°€ ìˆì„ ê²½ìš°
+            Ray ray = new Ray(firstPersonCamera.transform.position, firstPersonCamera.transform.forward);   //¹Ş¾Æ¿Â 1ÀÎÄª Ä«¸Ş¶ó ¾ÕÀ¸·Î ray
+            if(Physics.Raycast(ray, out RaycastHit hitInfo, maxBuildDistance))  //¼³Á¤ÇÑ ray¿¡ ¹°Ã¼°¡ ÀÖÀ» °æ¿ì
             {
-                Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.red); //Secne ì°½ì—ì„œ ë¹¨ê°„ìƒ‰ ì„ ìœ¼ë¡œ rayë¥¼ ë³´ì—¬ì¤€ë‹¤.
-                return hitInfo.point;                                                   //raycast ëœ ë¬¼ì²´ ì •ë³´ë¥¼ ë¦¬í„´í•˜ë‹¤.
+                Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.red);     //Scene Ã¢¿¡¼­ »¡°£»ö ¼±À¸·Î ray¸¦ º¸¿©ÁØ´Ù.
+                return hitInfo.point;                                                       //raycast µÈ ¹°Ã¼ Á¤º¸¸¦ ¸®ÅÏÇÑ´Ù. 
             }
             else
             {
-                Debug.DrawRay(ray.origin, ray.direction * maxBuildDistance, Color.white);   //Secen ì°½ì—ì„œ í•˜ì–€ìƒ‰ ì„ ìœ¼ë¡œ rayë¥¼ ë³´ì—¬ì¤€ë‹¤
+                Debug.DrawRay(ray.origin, ray.direction * maxBuildDistance, Color.white);    //Scene Ã¢¿¡¼­ ÇÏ¾á»ö ¼±À¸·Î ray¸¦ º¸¿©ÁØ´Ù.
             }
         }
+        //ÇÃ·¹ÀÌ¾î°¡ 3ÀÎÄª ¸ğµå
         else
         {
-            Vector3 characterPosition = playerController.transform.position;                        //ìºë¦­í„° ìœ„ì¹˜ ì„ ì–¸
-            Vector3 characterForward = playerController.transform.forward;                          //ìºë¦­í„° ì•ë°©í–¥ ì„ ì–¸
-            Vector3 rayOrigin = characterPosition + Vector3.up * 1.5f + characterForward * 0.5f;    //ë ˆì´ë¥¼ ì‹œì‘ ìœ„ì¹˜ ì„¤ì •
-            Vector3 rayDirection = (characterForward - Vector3.up).normalized;                      //ë ˆì´ë¥¼ ì  ë°©í–¥ ì„¤ì • í›„ ì •ê·œì§ (0~1)
+            Vector3 characterPosition = playerController.transform.position;                    //Ä³¸¯ÅÍ À§Ä¡ ¼±¾ğ
+            Vector3 characterForward = playerController.transform.forward;                      //Ä³¸¯ÅÍ ¾Õ¹æÇâ ¼±¾ğ
+            Vector3 rayOrigin = characterPosition + Vector3.up * 1.5f + characterForward * 0.5f;    //·¹ÀÌ¸¦ ½ÃÀÛ À§Ä¡ ¼³Á¤
+            Vector3 rayDirection = (characterForward - Vector3.up).normalized;                  //·¹ÀÌ¸¦ ½ò ¹æÇâ ¼³Á¤ ÈÄ Á¤±ÔÈ­ (0~1)
 
-            Ray ray = new Ray(firstPersonCamera.transform.position, firstPersonCamera.transform.forward);   //ë°›ì•„ì˜¨ 1ì¸ì¹­ ì¹´ë©”ë¼ ì•ìœ¼ë¡œ ray
-            if (Physics.Raycast(ray, out RaycastHit hitInfo, maxBuildDistance))  //ì„¤ì •í•œ rayì— ë¬¼ì²´ê°€ ìˆì„ ê²½ìš°
+            Ray ray = new Ray(rayOrigin, rayDirection);                             //¸¸µç À§Ä¡¿Í ¹æÇâÀ¸·Î ray ¸¦ »ı¼º 
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, maxBuildDistance))  //¼³Á¤ÇÑ ray¿¡ ¹°Ã¼°¡ ÀÖÀ» °æ¿ì
             {
-                    Debug.DrawRay(ray.origin, ray.direction * maxBuildDistance, Color.red); //Secne ì°½ì—ì„œ ë¹¨ê°„ìƒ‰ ì„ ìœ¼ë¡œ rayë¥¼ ë³´ì—¬ì¤€ë‹¤.
-                    return hitInfo.point;                                                   //raycast ëœ ë¬¼ì²´ ì •ë³´ë¥¼ ë¦¬í„´í•˜ë‹¤.
+                Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.blue);     //Scene Ã¢¿¡¼­ Ã»»ö ¼±À¸·Î ray¸¦ º¸¿©ÁØ´Ù.
+                return hitInfo.point;                                                       //raycast µÈ ¹°Ã¼ Á¤º¸¸¦ ¸®ÅÏÇÑ´Ù. 
             }
             else
             {
-                    Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.white);   //Secen ì°½ì—ì„œ í•˜ì–€ìƒ‰ ì„ ìœ¼ë¡œ rayë¥¼ ë³´ì—¬ì¤€ë‹¤
+                Debug.DrawRay(ray.origin, ray.direction * maxBuildDistance, Color.white);    //Scene Ã¢¿¡¼­ ÇÏ¾á»ö ¼±À¸·Î ray¸¦ º¸¿©ÁØ´Ù.
             }
         }
 
-        return Vector3.zero;
+        return Vector3.zero;            
     }
 
-    //ê·¸ë¦¬ë“œ í¬ì§€ì…˜ì´ ìœ íš¨í•œì§€ í™•ì¸í•˜ëŠ” í•¨ìˆ˜
-
-    private bool isValidGridPosition(Vector3 gridPosition)
+    //±×¸®µå Æ÷Áö¼ÇÀÌ À¯È£ÇÑÁö È®ÀÎÇÏ´Â ÇÔ¼ö
+    private bool isValidGridPosition(Vector3Int gridPosition)
     {
-        return gridPosition.magnitude > 0 && gridPosition.x < width &&
-                gridPosition.z >= 0 && gridPosition.z < height;
+        return gridPosition.x >= 0 && gridPosition.x < width &&
+            gridPosition.z >= 0 && gridPosition.z < height;
     }
 
-    private void OnDrawGizmos()     //Gizomë¥¼ í‘œì‹œí•´ì£¼ëŠ” í•¨ìˆ˜
+
+    private void OnDrawGizmos()     //Gizmo¸¦ Ç¥½ÃÇØÁÖ´Â ÇÔ¼ö 
     {
         Gizmos.color = Color.blue;
         for(int x = 0; x < width; x++)
         {
-            for(int z = 0; z < height; z++)
+            for(int z  = 0; z < height; z++)
             {
-                Vector3 cellCenter = grid.GetCellCenterWorld(new Vector3Int(x, 0, z));      //ê·¸ë¦¬ë“œ ì¤‘ì‹¬ ì ì„ ê°€ì ¸ì˜¨ë‹¤.
-                Gizmos.DrawWireCube(cellCenter, new Vector3(cellSize, 0.1f, cellSize));     //ê°ê°ì˜ ì¹¸ì„ ê·¸ë ¤ì¤€ë‹¤.
+                Vector3 cellCenter = grid.GetCellCenterWorld(new Vector3Int(x, 0, z));  //±×¸®µå Áß½É Á¡À» °¡Á®¿Â´Ù.
+                Gizmos.DrawWireCube(cellCenter, new Vector3(cellSize, 0.1f, cellSize)); //°¢°¢ÀÇ Ä­À» ±×·ÁÁØ´Ù. 
             }
         }
     }
