@@ -4,11 +4,42 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    private SurvivalStats survivalStats;                //클래스 선언
+
     //각각의 아이템 개수를 저장하는 변수 
     public int crystalCount = 0;            //크리스탈 개수
     public int plantCount = 0;              //식물 개수
     public int bushCount = 0;               //수풀 개수
     public int treeCount = 0;               //나무 개수 
+
+    public void Start()
+    {
+        survivalStats = GetComponent<SurvivalStats>();
+    }
+
+    public void UseItem(ItemType itemType)
+    {
+        if (GetItemCount(itemType) <= 0)
+        {
+            return;
+        }
+
+        switch (itemType)
+        {
+            case ItemType.VegetableStew:
+                Removeitem(ItemType.VegetableStew, 1);
+                survivalStats.EatFood(RecipeList.KitchenRecipes[0].hungerRestoreAmount);
+                break;
+            case ItemType.FruitSalad:
+                Removeitem(ItemType.FruitSalad, 1);
+                survivalStats.EatFood(RecipeList.KitchenRecipes[1].hungerRestoreAmount);
+                break;
+            case ItemType.RepairKit:
+                Removeitem(ItemType.RepairKit, 1);
+                survivalStats.EatFood(RecipeList.WorkbenchRecipes[0].repairAmount);
+                break;
+        }
+    }
 
     //여러 아이템을 한꺼번에 획득
     public void AddItem(ItemType itemType, int amount)
@@ -87,7 +118,7 @@ public class PlayerInventory : MonoBehaviour
         Debug.Log($"{itemType} 아이템이 부족합니다");
         return false;
     }
-    public int Getitemcount(ItemType itemType)
+    public int GetItemCount(ItemType itemType)
     {
         switch (itemType)
         {
