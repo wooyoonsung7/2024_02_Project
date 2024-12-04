@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Building;
+using static BuildingType;
 
 public class ConstructibleBuilding : MonoBehaviour
 {
     [Header("Building Seetings")]
     public BuildingType buildingType;
-    public string buildigName;
+    public string buildingName;
     public int requiredTree = 5;
     public float constructionTime = 2.0f;
 
@@ -41,7 +41,7 @@ public class ConstructibleBuilding : MonoBehaviour
 
             if (FloatingTextManager.Instance != null)
             {
-                FloatingTextManager.Instance.Show($"{buildigName} 건설완료!", transform.position + Vector3.up);
+                FloatingTextManager.Instance.Show($"{buildingName} 건설완료!", transform.position + Vector3.up);
             }
         }
     }
@@ -54,7 +54,7 @@ public class ConstructibleBuilding : MonoBehaviour
             inventory.Removeitem(ItemType.Tree, requiredTree);
             if (FloatingTextManager.Instance == null)
             {
-                FloatingTextManager.Instance.Show($"{buildigName} 건설 시작!", transform.position + Vector3.up);
+                FloatingTextManager.Instance.Show($"{buildingName} 건설 시작!", transform.position + Vector3.up);
             }
             StartCoroutine(CostructionRoutine());
         }

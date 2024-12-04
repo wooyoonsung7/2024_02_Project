@@ -1,4 +1,4 @@
-using static Building;
+using static BuildingType;
 
 public class RecipeList
 {
@@ -7,7 +7,7 @@ public class RecipeList
         new CraftingRecipe
         {
             itemName = "야채 스튜",
-            resultltem = ItemType.VegetableStew,
+            resultItem = ItemType.VegetableStew,
             resultAmount = 1,
             hungerRestoreAmount = 40f,
             requiredItems = new ItemType[] {ItemType.Plant , ItemType.Bush },
@@ -16,7 +16,7 @@ public class RecipeList
         new CraftingRecipe
         {
             itemName = "과일 샐러드",
-            resultltem = ItemType.FruitSalad,
+            resultItem = ItemType.FruitSalad,
             resultAmount = 1,
             hungerRestoreAmount = 60f,
             requiredItems = new ItemType[] {ItemType.Plant , ItemType.Bush },
@@ -28,7 +28,7 @@ public class RecipeList
          new CraftingRecipe
         {
             itemName = "수리 키트",
-            resultltem = ItemType.RepairKit,
+            resultItem = ItemType.RepairKit,
             resultAmount = 1,
             hungerRestoreAmount = 25f,
             requiredItems = new ItemType[] {ItemType.Crystal},
