@@ -13,9 +13,9 @@ public class BuildingCrafter : MonoBehaviour
     void Start()
     {
         survivalStats = FindObjectOfType<SurvivalStats>();
-        building = GetComponent<ConstructibleBuilding>();
+        building = GetComponent<ConstructibleBuilding>();   
 
-        switch (buildingType)                                    //건물 타입에 따라 레시피 설정 
+        switch(buildingType)                                    //건물 타입에 따라 레시피 설정 
         {
             case BuildingType.Kitchen:
                 recipes = RecipeList.KitchenRecipes;
@@ -26,9 +26,9 @@ public class BuildingCrafter : MonoBehaviour
         }
     }
 
-    public void TryCraft(CraftingRecipe recipe, PlayerInventory inventory)     //아이템 제작 시도 
-    {
-        if (!building.isConstructed)                     //건설이 완료되지 않았다면 제작 불가
+    public void TryCraft(CraftingRecipe recipe , PlayerInventory inventory)     //아이템 제작 시도 
+    {   
+        if(!building.isConstructed)                     //건설이 완료되지 않았다면 제작 불가
         {
             FloatingTextManager.Instance?.Show("건설이 완료 되지 않았습니다!", transform.position + Vector3.up);
             return;
@@ -38,7 +38,7 @@ public class BuildingCrafter : MonoBehaviour
         {
             if (inventory.GetItemCount(recipe.requiredItems[i]) < recipe.requiredAmounts[i])
             {
-                FloatingTextManager.Instance?.Show("재료가 부족합니다. !", transform.position + Vector3.up);
+                FloatingTextManager.Instance?.Show("재료가 부족합니다. !" , transform.position + Vector3.up);
                 return;
             }
         }
@@ -50,7 +50,8 @@ public class BuildingCrafter : MonoBehaviour
 
         survivalStats.DamageOnCrafting();                   //우주복 내구도 감소
 
-        
-
+        inventory.AddItem(recipe.resultItem, recipe.resultAmount);      //아이템 제작
+        FloatingTextManager.Instance?.Show($"{ recipe.itemName } 제작 완료!" , transform.position + Vector3.up);
     }
+
 }

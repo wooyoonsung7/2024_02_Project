@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    private SurvivalStats survivalStats;                //클래스 선언
+    private SurvivalStats survivalStats;                    //클래스 선언 
 
     //각각의 아이템 개수를 저장하는 변수 
     public int crystalCount = 0;            //크리스탈 개수
@@ -13,9 +14,10 @@ public class PlayerInventory : MonoBehaviour
     public int treeCount = 0;               //나무 개수 
 
     //추가할 변수들
-    public int vegetableStewCount = 0;
-    public int fruitSaledCount = 0;
-    public int repairKitCount = 0;
+    public int vegetableStewCount = 0;              //야채 스튜 개수
+    public int fruitSaledCount = 0;                 //과일 샐러드 개수 
+    public int repairKitCount = 0;                  //수리 키트 개수 
+
 
     public void Start()
     {
@@ -24,12 +26,12 @@ public class PlayerInventory : MonoBehaviour
 
     public void UseItem(ItemType itemType)
     {
-        if (GetItemCount(itemType) <= 0)
+        if (GetItemCount(itemType) <= 0)             //해당 아이템이 있는지 확인
         {
             return;
         }
 
-        switch (itemType)
+        switch (itemType)                           //아이템 타입에 따른 효과 적용
         {
             case ItemType.VegetableStew:
                 Removeitem(ItemType.VegetableStew, 1);
@@ -46,10 +48,10 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    //여러 아이템을 한꺼번에 획득
+    //여러 아이템을 한꺼번에 획득 
     public void AddItem(ItemType itemType, int amount)
     {
-        //amount 만틈 여러번 Additme 호출
+        //amount 만큼 여러번 AddItem 호출 
         for(int i = 0; i < amount; i++)
         {
             AddItem(itemType);
@@ -78,65 +80,67 @@ public class PlayerInventory : MonoBehaviour
                 treeCount++;  //나무 개수 증가
                 Debug.Log($"나무 획득! 현재 개수 :{treeCount}");           //현재 나무 개수 출력 
                 break;
+
             case ItemType.VegetableStew:
-                treeCount++;  //나무 개수 증가
-                Debug.Log($"야채 스튜 획득! 현재 개수 :{vegetableStewCount}");          
+                vegetableStewCount++;
+                Debug.Log($"야채 스튜 획득! 현재 개수 :{vegetableStewCount}");           //현재 야채 스튜 개수 출력 
                 break;
             case ItemType.FruitSalad:
-                treeCount++;  //나무 개수 증가
-                Debug.Log($"과일 샐러드 획득! 현재 개수 :{fruitSaledCount}");          
+                fruitSaledCount++;
+                Debug.Log($"과일 셀러드 획득! 현재 개수 :{fruitSaledCount}");           //현재 과일 샐러드 개수 출력 
                 break;
             case ItemType.RepairKit:
-                treeCount++;  //나무 개수 증가
-                Debug.Log($"수리키트 획득! 현재 개수 :{repairKitCount}");            
+                repairKitCount++;
+                Debug.Log($"수리키트 획득! 현재 개수 :{repairKitCount}");           //현재 수리 키트 개수 출력 
                 break;
+
         }
     }
 
-    //아이템을 제거하는 함수 
+    //아이템을 제거하는 함수
     public bool Removeitem(ItemType itemType, int amount = 1)
     {
         //아이템 종류에 따른 다른 동작 수행 
         switch (itemType)
         {
             case ItemType.Crystal:
-                if (crystalCount >= amount)
+                if (crystalCount >= amount)      //가지고 있는 개수가 충분한지 확인
                 {
-                    crystalCount -= amount;
-                    Debug.Log($"크리스탈 {amount} 사용! 현재 개수 :{crystalCount}");
+                    crystalCount -= amount;  //크리스탈 개수 감소
+                    Debug.Log($"크리스탈 {amount} 사용! 현재 개수 :{crystalCount}");           //현재 크리스탈 개수 출력 
                     return true;
-                }
+                }              
                 break;
             case ItemType.Plant:
-                if (plantCount >= amount)
+                if (plantCount >= amount)      //가지고 있는 개수가 충분한지 확인
                 {
-                    plantCount -= amount;
-                    Debug.Log($"식물 {amount} 사용! 현재 개수 :{crystalCount}");
+                    plantCount -= amount;  //식물 개수 증가
+                    Debug.Log($"식물 {amount} 사용!현재 개수 :{plantCount}");           //현재 식물 개수 출력 
                     return true;
                 }
                 break;
             case ItemType.Bush:
-                if (plantCount >= amount)
+                if (bushCount >= amount)      //가지고 있는 개수가 충분한지 확인
                 {
-                    plantCount -= amount;
-                    Debug.Log($"수풀 {amount} 사용! 현재 개수 :{crystalCount}");
+                    bushCount -= amount;   //수풀 개수 증가
+                    Debug.Log($"수풀 {amount} 사용! 현재 개수 :{bushCount}");           //현재 수풀 개수 출력 
                     return true;
                 }
                 break;
             case ItemType.Tree:
-                if (plantCount >= amount)
+                if(treeCount >= amount)
                 {
-                    plantCount -= amount;
-                    Debug.Log($"나무 {amount} 사용! 현재 개수 :{crystalCount}");
+                    treeCount -= amount;   //나무 개수 증가
+                    Debug.Log($"나무 {amount} 사용! 현재 개수 :{treeCount}");           //현재 나무 개수 출력 
                     return true;
-                }
+                }               
                 break;
 
             case ItemType.VegetableStew:
                 if (vegetableStewCount >= amount)
                 {
-                    vegetableStewCount -= amount;
-                    Debug.Log($"야채 스튜 {amount} 사용! 현재 개수 :{vegetableStewCount}");
+                    vegetableStewCount -= amount;   //야채 스튜 개수 증가
+                    Debug.Log($"야채 스튜 {amount} 사용! 현재 개수 :{vegetableStewCount}");           //현재 야채 스튜 개수 출력 
                     return true;
                 }
                 break;
@@ -144,8 +148,8 @@ public class PlayerInventory : MonoBehaviour
             case ItemType.FruitSalad:
                 if (fruitSaledCount >= amount)
                 {
-                    fruitSaledCount -= amount;
-                    Debug.Log($"과일 샐러드 {amount} 사용! 현재 개수 :{fruitSaledCount}");
+                    fruitSaledCount -= amount;   //과일 샐러드 개수 증가
+                    Debug.Log($"과일 샐러드 {amount} 사용! 현재 개수 :{fruitSaledCount}");           //현재 과일 샐러드 개수 출력 
                     return true;
                 }
                 break;
@@ -153,15 +157,17 @@ public class PlayerInventory : MonoBehaviour
             case ItemType.RepairKit:
                 if (repairKitCount >= amount)
                 {
-                    repairKitCount -= amount;
-                    Debug.Log($"수리 키트 {amount} 사용! 현재 개수 :{repairKitCount}");
+                    repairKitCount -= amount;   //수리 키트 개수 증가
+                    Debug.Log($"수리 키트 {amount} 사용! 현재 개수 :{repairKitCount}");           //현재 수리 키트 개수 출력 
                     return true;
                 }
                 break;
         }
-        Debug.Log($"{itemType} 아이템이 부족합니다");
+        Debug.Log($"{itemType} 아이템이 부족합니다.");
         return false;
     }
+
+    //특정 아이템의 현재 개수를 반환 하는 함수 
     public int GetItemCount(ItemType itemType)
     {
         switch (itemType)
@@ -176,11 +182,12 @@ public class PlayerInventory : MonoBehaviour
                 return treeCount;
 
             case ItemType.VegetableStew:
-                return treeCount;
+                return vegetableStewCount;
             case ItemType.FruitSalad:
-                return treeCount;
+                return fruitSaledCount;
             case ItemType.RepairKit:
-                return treeCount;
+                return repairKitCount;
+
             default:
                 return 0;
         }

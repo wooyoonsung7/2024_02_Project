@@ -10,8 +10,8 @@ public enum ItemType
     Bush,                   //수풀
     Tree,                   //나무 
     VegetableStew,          //야채 스튜 (허기 회복용)
-    FruitSalad,             //과일 샐러드
-    RepairKit               //
+    FruitSalad,             //과일 샐러스 (허기 회복용)
+    RepairKit               //수리 키트 (우주복 수리용)
 }
 
 public class ItemDetector : MonoBehaviour
